@@ -1,0 +1,6 @@
+{
+  "name": "打车用户行为 Session 分析系统",
+  "description": "支持真实车型列表模拟交互、多Sheet Excel数据一键导入、时序行为日志捕捉以及由 Gemini 驱动的出行决策深度 AI 诊断与精细化运营建议。",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
