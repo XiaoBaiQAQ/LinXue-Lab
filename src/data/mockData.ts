@@ -13,7 +13,8 @@ export const INITIAL_VEHICLE_OPTIONS: VehicleOption[] = [
     priceDesc: '一口价',
     price: 13.0,
     subLabel: '站点拼车更便宜',
-    checked: false
+    checked: false,
+    displayOrder: 1
   },
   {
     id: 'surprise_promo',
@@ -21,7 +22,8 @@ export const INITIAL_VEHICLE_OPTIONS: VehicleOption[] = [
     category: 'recommend',
     priceDesc: '固定价',
     price: 19.1,
-    checked: true
+    checked: true,
+    displayOrder: 2
   },
   {
     id: 'express_promo',
@@ -32,7 +34,8 @@ export const INITIAL_VEHICLE_OPTIONS: VehicleOption[] = [
     tag: 'V6-¥4.6',
     subLabel: '大家常选',
     waitingDesc: '7秒',
-    checked: true
+    checked: true,
+    displayOrder: 3
   },
   {
     id: 'carpool_promo',
@@ -42,7 +45,8 @@ export const INITIAL_VEHICLE_OPTIONS: VehicleOption[] = [
     price: 19.3,
     originalPrice: 22.5,
     discountDesc: '最高优惠¥4.8',
-    checked: false
+    checked: false,
+    displayOrder: 4
   },
   {
     id: 'express_carpool',
@@ -53,7 +57,8 @@ export const INITIAL_VEHICLE_OPTIONS: VehicleOption[] = [
     discountDesc: '已优惠¥5.4',
     subLabel: '先出发 顺路拼',
     waitingDesc: '2分钟',
-    checked: false
+    checked: false,
+    displayOrder: 5
   },
   {
     id: 'didi_express',
@@ -64,7 +69,8 @@ export const INITIAL_VEHICLE_OPTIONS: VehicleOption[] = [
     tag: 'V6-¥4.6',
     subLabel: 'V7快速应答+',
     waitingDesc: '3秒',
-    checked: false
+    checked: false,
+    displayOrder: 6
   },
   {
     id: 'six_seat_premium',
@@ -75,7 +81,8 @@ export const INITIAL_VEHICLE_OPTIONS: VehicleOption[] = [
     discountDesc: '已优惠¥30.7',
     subLabel: '超大空间 舒适可躺',
     waitingDesc: '7秒',
-    checked: false
+    checked: false,
+    displayOrder: 7
   }
 ];
 

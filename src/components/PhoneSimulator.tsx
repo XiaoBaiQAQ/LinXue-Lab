@@ -292,6 +292,11 @@ export default function PhoneSimulator({
                       }`}>
                         {v.name}
                       </span>
+                      {v.displayOrder !== undefined && (
+                        <span className="text-[8px] font-black font-mono w-3.5 h-3.5 flex items-center justify-center bg-slate-100/80 text-slate-500 rounded-full border border-slate-200/50 shrink-0 select-none" title={`展示顺序: ${v.displayOrder}`}>
+                          {v.displayOrder}
+                        </span>
+                      )}
                       {v.waitingDesc && (
                         <span className="text-[8px] bg-neutral-100 text-neutral-500 px-1 rounded">
                           {v.waitingDesc}
