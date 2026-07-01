@@ -12,8 +12,8 @@ import {
   DEFAULT_PAST_30_DAYS,
   DEFAULT_EXCEL_SESSIONS
 } from './data/mockData';
-import PhoneSimulator from './components/PhoneSimulator';
 import ExcelImporter from './components/ExcelImporter';
+import PhoneSimulator from './components/PhoneSimulator';
 import AnalyticsPanel from './components/AnalyticsPanel';
 import { Compass, Sparkles, Activity, FileSpreadsheet, HelpCircle, ChevronLeft, ChevronRight, Copy, Check } from 'lucide-react';
 
@@ -503,12 +503,6 @@ export default function App() {
           {/* LEFT PANEL: SMART PHONE SIMULATOR (4 Columns on large screens) */}
           <div className="lg:col-span-4 flex justify-center">
             <div className="flex flex-col items-center">
-              {/* Simulator Header tag */}
-              <div className="mb-2 text-center">
-                <span className="text-[10px] font-bold text-slate-400 bg-slate-100 px-2.5 py-1 rounded-full uppercase tracking-wider">
-                  📱 打车端交互模拟沙盒
-                </span>
-              </div>
               <PhoneSimulator
                 vehicleOptions={vehicleOptions}
                 onToggleVehicle={handleToggleVehicle}

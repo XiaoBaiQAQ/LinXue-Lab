@@ -5,7 +5,7 @@
 
 import React, { useState } from 'react';
 import { VehicleOption, SessionEvent } from '../types';
-import { ChevronLeft, Compass, Shield, Navigation2, MoreHorizontal, HelpCircle, Settings, TrendingUp } from 'lucide-react';
+import { Compass, Shield, Navigation2, MoreHorizontal, HelpCircle, Settings, TrendingUp } from 'lucide-react';
 
 interface PhoneSimulatorProps {
   vehicleOptions: VehicleOption[];
@@ -171,23 +171,14 @@ export default function PhoneSimulator({
           />
         </svg>
 
-        {/* Back and Safety Overlays */}
-        <button 
-          id="btn-phone-back"
-          onClick={() => onAddEvent('view', '用户点击模拟器左上角返回按钮')}
-          className="absolute top-3 left-3 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-md text-neutral-700 hover:bg-neutral-50"
-        >
-          <ChevronLeft className="w-5 h-5 stroke-[2.5]" />
-        </button>
-
         {/* Shield Icon & Compass Overlays */}
-        <div className="absolute bottom-16 left-3 flex flex-col gap-2">
+        <div className="absolute bottom-16 left-3 flex flex-col gap-2 z-20">
           <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-lg text-white">
             <Shield className="w-4 h-4 fill-white" />
           </div>
         </div>
 
-        <div className="absolute bottom-16 right-3 flex flex-col gap-1.5">
+        <div className="absolute bottom-16 right-3 flex flex-col gap-1.5 z-20">
           <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-md text-slate-700">
             <Compass className="w-4 h-4" />
           </div>
@@ -220,9 +211,9 @@ export default function PhoneSimulator({
         </div>
 
         {/* Commute Tag */}
-        <div className="absolute top-3 right-3 bg-slate-900/80 backdrop-blur-xs text-white px-2 py-0.5 rounded text-[8px] font-semibold flex items-center gap-1">
+        <div className="absolute top-3 right-3 bg-slate-900/80 backdrop-blur-xs text-white px-2 py-0.5 rounded text-[8px] font-semibold flex items-center gap-1 z-20">
           <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-ping"></span>
-          时间快 {distanceKm}公里 {durationMin}分钟
+          {distanceKm}公里
         </div>
       </div>
 
