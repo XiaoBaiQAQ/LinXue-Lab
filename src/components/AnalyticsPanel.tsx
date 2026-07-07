@@ -259,9 +259,27 @@ export default function AnalyticsPanel({
                           <span className="font-extrabold text-slate-800 text-[11px] bg-slate-200/60 px-2 py-0.5 rounded-md">
                             🚗 {ride.vehicleType}
                           </span>
+                          {ride.orderSource && (
+                            <span className={`text-[9px] font-extrabold px-1.5 py-0.5 rounded-sm border ${
+                              ride.orderSource === '冒泡' 
+                                ? 'bg-orange-50 text-orange-700 border-orange-100' 
+                                : 'bg-blue-50 text-blue-700 border-blue-100'
+                            }`}>
+                              {ride.orderSource}
+                            </span>
+                          )}
                           {ride.acceptRate && (
                             <span className="text-[9px] bg-indigo-50 text-indigo-700 font-extrabold px-1.5 py-0.5 rounded-sm border border-indigo-100">
                               应答率: {ride.acceptRate}
+                            </span>
+                          )}
+                          {ride.isPremiumZone && (
+                            <span className={`text-[9px] font-extrabold px-1.5 py-0.5 rounded-sm border ${
+                              ride.isPremiumZone.includes('特区') && !ride.isPremiumZone.includes('非')
+                                ? 'bg-amber-50 text-amber-700 border-amber-200'
+                                : 'bg-slate-100/80 text-slate-600 border-slate-200'
+                            }`}>
+                              {ride.isPremiumZone}
                             </span>
                           )}
                         </div>

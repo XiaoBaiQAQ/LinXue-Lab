@@ -15,8 +15,8 @@ export interface UserPersona {
   labels: string[]; // e.g., ["羊毛党", "商务出行", "通勤首选", "夜间出行"]
   averageRating: number; // User rating given to drivers, e.g. 4.85
   preRideCompareTimeSec: number; // Average time spent comparing prices before booking
-  city?: string; // Column V
-  historyRaw?: string; // Column W
+  city?: string; // Column X
+  historyRaw?: string; // Column Y
 }
 
 export interface CurrentSession {
@@ -31,9 +31,11 @@ export interface CurrentSession {
   deviceType: string;
   userChoices: string[]; // List of vehicle IDs selected simultaneously
   sessionEvents: SessionEvent[];
-  startScene?: string; // Column R
-  endScene?: string; // Column S
-  bubbleTime?: string; // Column J
+  startCity?: string;   // Column P
+  endCity?: string;     // Column Q
+  startScene?: string;  // Column T
+  endScene?: string;    // Column U
+  bubbleTime?: string;  // Column J
   estimatedAcceptRate?: string; // Column I
   callTime?: string; // Column K
   replyTime?: string; // Column L
@@ -85,6 +87,8 @@ export interface HistoricalRide {
   defaultChecked?: string[];     // 本次冒泡默认勾
   addedChecked?: string[];       // 加勾
   removedChecked?: string[];     // 减勾
+  orderSource?: string;          // 订单来源 (冒泡 / 等应答)
+  isPremiumZone?: string;        // 是否特区
 }
 
 export interface Past30DaysData {
@@ -100,18 +104,20 @@ export interface Past30DaysData {
 
 export interface ParsedExcelSession {
   passengerId: string;
-  startLocation: string; // P
-  endLocation: string; // Q
-  startScene: string; // R
-  endScene: string; // S
+  startCity?: string; // P
+  endCity?: string; // Q
+  startLocation: string; // R
+  endLocation: string; // S
+  startScene: string; // T
+  endScene: string; // U
   distanceMeters: number; // O
   distanceKm: number; // O / 1000
   bubbleTime: string; // J
   estimatedAcceptRate: string; // I
-  age: string | number; // T
-  gender: string; // U
-  city: string; // V
-  historyRaw: string; // W
+  age: string | number; // V
+  gender: string; // W
+  city: string; // X
+  historyRaw: string; // Y
   vehicles: VehicleOption[];
   callTime?: string; // K
   replyTime?: string; // L

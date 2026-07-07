@@ -82,7 +82,7 @@ export default function ExcelImporter({ onDataImported, onAddEvent }: ExcelImpor
         "乘客属性-乘客ID", "冒泡主键-冒", "冒泡主键-预", "车型", "展示顺序", 
         "是否首屏曝光", "是否推荐区", "是否默勾", "预估应答率", "冒泡时间", 
         "呼叫时间", "应答时间", "订单状态", "券后价, 单位:分", "乘客属性-订单距离", 
-        "出发地地址", "目的地地址", "起点场景", "终点场景", "年龄（段）", 
+        "出发城市", "终点城市", "出发地", "目的地", "起点场景", "终点场景", "年龄（段）", 
         "性别", "城市", "历史订单"
       ];
 
@@ -91,49 +91,49 @@ export default function ExcelImporter({ onDataImported, onAddEvent }: ExcelImpor
         [
           "c448d6e66a", "17e744d5de", "0.9-1.0", "普通快车", 1, 1, 1, 1, "0.9-1.0", "2026-06-25 01:46:00", 
           "2026-06-25 01:47:21", null, "5", 2880, 8003, 
-          "不会飞的烧鸟(华星新村店)", "远洋公寓东区-西北门", "休闲娱乐·餐饮", "工作区域·公司", "42", "男", "杭州市",
+          "杭州市", "杭州市", "不会飞的烧鸟(华星新村店)", "远洋公寓东区-西北门", "休闲娱乐·餐饮", "工作区域·公司", "42", "男", "杭州市",
           "[2026/06/11 03:26:15***0.9...***特惠快车]\n[2026/06/24 13:19:55***普通快车]"
         ],
         [
           "c448d6e66a", "5122e8e8cc", "0.9-1.0", "特惠出租车", 2, 1, 1, 0, "0.9-1.0", "2026-06-25 01:46:00", 
           null, null, "-", 2720, 8003, 
-          "不会飞的烧鸟(华星新村店)", "远洋公寓东区-西北门", "休闲娱乐·餐饮", "工作区域·公司", "42", "男", "杭州市",
+          "杭州市", "杭州市", "不会飞的烧鸟(华星新村店)", "远洋公寓东区-西北门", "休闲娱乐·餐饮", "工作区域·公司", "42", "男", "杭州市",
           "[2026/06/11 03:26:15***0.9...***特惠快车]\n[2026/06/24 13:19:55***普通快车]"
         ],
         [
           "c448d6e66a", "e4fecac12b", "0.9-1.0", "线上让补_补", 2, 1, 1, 1, "0.9-1.0", "2026-06-25 01:46:00", 
           "2026-06-25 01:47:21", null, "5", 2923, 8003, 
-          "不会飞的烧鸟(华星新村店)", "远洋公寓东区-西北门", "休闲娱乐·餐饮", "工作区域·公司", "42", "男", "杭州市",
+          "杭州市", "杭州市", "不会飞的烧鸟(华星新村店)", "远洋公寓东区-西北门", "休闲娱乐·餐饮", "工作区域·公司", "42", "男", "杭州市",
           "[2026/06/11 03:26:15***0.9...***特惠快车]\n[2026/06/24 13:19:55***普通快车]"
         ],
         [
           "c448d6e66a", "24c3cd72bd", "0.9-1.0", "普通快车", 3, 1, 1, 1, "0.9-1.0", "2026-06-25 01:46:00", 
           "2026-06-25 01:47:21", null, "5", 3203, 8003, 
-          "不会飞的烧鸟(华星新村店)", "远洋公寓东区-西北门", "休闲娱乐·餐饮", "工作区域·公司", "42", "男", "杭州市",
+          "杭州市", "杭州市", "不会飞的烧鸟(华星新村店)", "远洋公寓东区-西北门", "休闲娱乐·餐饮", "工作区域·公司", "42", "男", "杭州市",
           "[2026/06/11 03:26:15***0.9...***特惠快车]\n[2026/06/24 13:19:55***普通快车]"
         ],
         [
           "c448d6e66a", "5559569572", "0.9-1.0", "滴滴轻享专车", 4, 1, 1, 1, "0.9-1.0", "2026-06-25 01:46:00", 
           "2026-06-25 01:47:21", "2026-06-25 01:47:22", "5", 3290, 8003, 
-          "不会飞的烧鸟(华星新村店)", "远洋公寓东区-西北门", "休闲娱乐·餐饮", "工作区域·公司", "42", "男", "杭州市",
+          "杭州市", "杭州市", "不会飞的烧鸟(华星新村店)", "远洋公寓东区-西北门", "休闲娱乐·餐饮", "工作区域·公司", "42", "男", "杭州市",
           "[2026/06/11 03:26:15***0.9...***特惠快车]\n[2026/06/24 13:19:55***普通快车]"
         ],
         [
           "c448d6e66a", "cac3d389bc", "0.9-1.0", "极速拼车", 5, 1, 1, 0, "0.9-1.0", "2026-06-25 01:46:00", 
           null, null, "-", 1470, 8003, 
-          "不会飞的烧鸟(华星新村店)", "远洋公寓东区-西北门", "休闲娱乐·餐饮", "工作区域·公司", "42", "男", "杭州市",
+          "杭州市", "杭州市", "不会飞的烧鸟(华星新村店)", "远洋公寓东区-西北门", "休闲娱乐·餐饮", "工作区域·公司", "42", "男", "杭州市",
           "[2026/06/11 03:26:15***0.9...***特惠快车]\n[2026/06/24 13:19:55***普通快车]"
         ],
         [
           "c448d6e66a", "f96f92ba15", "0.9-1.0", "特惠快车15t", 6, 1, 1, 0, "0.9-1.0", "2026-06-25 01:46:00", 
           null, null, "-", 1730, 8003, 
-          "不会飞的烧鸟(华星新村店)", "远洋公寓东区-西北门", "休闲娱乐·餐饮", "工作区域·公司", "42", "男", "杭州市",
+          "杭州市", "杭州市", "不会飞的烧鸟(华星新村店)", "远洋公寓东区-西北门", "休闲娱乐·餐饮", "工作区域·公司", "42", "男", "杭州市",
           "[2026/06/11 03:26:15***0.9...***特惠快车]\n[2026/06/24 13:19:55***普通快车]"
         ],
         [
           "c448d6e66a", "fbf2fbcda3", "0.9-1.0", "特惠快车", 7, 1, 1, 0, "0.9-1.0", "2026-06-25 01:46:00", 
           null, null, "-", 2460, 8003, 
-          "不会飞的烧鸟(华星新村店)", "远洋公寓东区-西北门", "休闲娱乐·餐饮", "工作区域·公司", "42", "男", "杭州市",
+          "杭州市", "杭州市", "不会飞的烧鸟(华星新村店)", "远洋公寓东区-西北门", "休闲娱乐·餐饮", "工作区域·公司", "42", "男", "杭州市",
           "[2026/06/11 03:26:15***0.9...***特惠快车]\n[2026/06/24 13:19:55***普通快车]"
         ]
       ];
@@ -189,7 +189,21 @@ export default function ExcelImporter({ onDataImported, onAddEvent }: ExcelImpor
         if (isSingleSheetFormat) {
           // Find index of each column
           const findColIdx = (names: string[], fallback: number): number => {
-            const idx = headers.findIndex(h => names.some(name => h.toLowerCase().includes(name.toLowerCase())));
+            // 1. Try exact match first to prevent substring collision
+            let idx = headers.findIndex(h => names.some(name => h.toLowerCase() === name.toLowerCase()));
+            if (idx !== -1) return idx;
+
+            // 2. Try partial match but guard against "城市" matching "出发城市"/"终点城市"
+            idx = headers.findIndex(h => names.some(name => {
+              const hLower = h.toLowerCase();
+              const nameLower = name.toLowerCase();
+              if (nameLower === '城市') {
+                if (hLower.includes('出发') || hLower.includes('终点') || hLower.includes('目的地') || hLower.includes('始发') || hLower.includes('到达')) {
+                  return false;
+                }
+              }
+              return hLower.includes(nameLower);
+            }));
             return idx !== -1 ? idx : fallback;
           };
 
@@ -207,14 +221,16 @@ export default function ExcelImporter({ onDataImported, onAddEvent }: ExcelImpor
           const orderStatusIdx = findColIdx(["订单状态", "状态", "是否接单", "是否应答"], 12);
           const ticketPriceIdx = findColIdx(["券后价", "券后价, 单位:分", "实际支付", "价格", "金额"], 13);
           const distanceIdx = findColIdx(["订单距离", "乘客属性-订单距离", "距离", "里程", "公里数"], 14);
-          const startLocationIdx = findColIdx(["出发地地址", "起点", "起点位置", "起点地址"], 15);
-          const endLocationIdx = findColIdx(["目的地地址", "终点", "终点位置", "终点地址"], 16);
-          const startSceneIdx = findColIdx(["起点场景", "出发场景"], 17);
-          const endSceneIdx = findColIdx(["终点场景", "目的地场景", "到达场景"], 18);
-          const ageIdx = findColIdx(["年龄", "年龄段", "年龄（段）"], 19);
-          const genderIdx = findColIdx(["性别"], 20);
-          const cityIdx = findColIdx(["城市", "注册城市"], 21);
-          const historyRawIdx = findColIdx(["历史订单", "历史订单轨迹"], 22);
+          const startCityIdx = findColIdx(["出发城市", "起点城市", "始发城市", "出发市"], 15);
+          const endCityIdx = findColIdx(["终点城市", "目的地城市", "到达城市", "终点市"], 16);
+          const startLocationIdx = findColIdx(["出发地", "出发地地址", "起点位置", "起点地址", "起点"], 17);
+          const endLocationIdx = findColIdx(["目的地", "目的地地址", "终点位置", "终点地址", "终点"], 18);
+          const startSceneIdx = findColIdx(["起点场景", "出发场景"], 19);
+          const endSceneIdx = findColIdx(["终点场景", "目的地场景", "到达场景"], 20);
+          const ageIdx = findColIdx(["年龄", "年龄段", "年龄（段）"], 21);
+          const genderIdx = findColIdx(["性别"], 22);
+          const cityIdx = findColIdx(["活跃城市", "注册城市", "城市"], 23);
+          const historyRawIdx = findColIdx(["历史订单", "历史订单轨迹"], 24);
 
           // Group rows by PassengerID with fill-down for merged cells
           const groups: { [passengerId: string]: any[] } = {};
@@ -300,6 +316,8 @@ export default function ExcelImporter({ onDataImported, onAddEvent }: ExcelImpor
               distMeters = distMeters * 1000;
             }
 
+            const startCity = findFirstNonEmpty(startCityIdx, '');
+            const endCity = findFirstNonEmpty(endCityIdx, '');
             const startLocation = findFirstNonEmpty(startLocationIdx, '出发地地址未知');
             const endLocation = findFirstNonEmpty(endLocationIdx, '目的地地址未知');
             const startScene = findFirstNonEmpty(startSceneIdx, '未知起点场景');
@@ -320,6 +338,8 @@ export default function ExcelImporter({ onDataImported, onAddEvent }: ExcelImpor
 
             return {
               passengerId: pid,
+              startCity,
+              endCity,
               startLocation,
               endLocation,
               startScene,
@@ -330,7 +350,7 @@ export default function ExcelImporter({ onDataImported, onAddEvent }: ExcelImpor
               estimatedAcceptRate,
               age,
               gender,
-              city,
+              city: city && city !== '未知' ? city : '未知',
               historyRaw,
               vehicles,
               callTime,

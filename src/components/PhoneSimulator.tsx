@@ -17,6 +17,8 @@ interface PhoneSimulatorProps {
   durationMin: number;
   startScene?: string;
   endScene?: string;
+  startCity?: string;
+  endCity?: string;
 }
 
 export default function PhoneSimulator({
@@ -28,7 +30,9 @@ export default function PhoneSimulator({
   distanceKm,
   durationMin,
   startScene,
-  endScene
+  endScene,
+  startCity,
+  endCity
 }: PhoneSimulatorProps) {
   const [activeCategory, setActiveCategory] = useState<'recommend' | 'more'>('recommend');
 
@@ -187,14 +191,14 @@ export default function PhoneSimulator({
           </div>
         </div>
 
-        {/* Simulated Combined Route-Scene Card Overlay (P+R and Q+S) */}
+        {/* Simulated Combined Route-Scene Card Overlay (P, R, T and Q, S, U) */}
         <div className="absolute top-11 left-3 right-3 bg-white p-2.5 rounded-2xl shadow-xl border border-slate-100 flex flex-col gap-1.5 z-20">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
             <div className="overflow-hidden min-w-0 flex-1 text-left">
-              <span className="text-[8px] text-neutral-400 font-extrabold uppercase">起点 (P+R列):</span>
+              <span className="text-[8px] text-neutral-400 font-extrabold uppercase">起点 (P、R、T列):</span>
               <p className="font-extrabold text-[10px] text-neutral-800 truncate leading-tight">
-                {startLocation} <span className="text-orange-500 font-bold ml-1 text-[8px] bg-orange-50 px-1 py-0.2 rounded-sm">({startScene || '餐饮'})</span>
+                {startCity ? `[${startCity}] ` : ''}{startLocation} <span className="text-orange-500 font-bold ml-1 text-[8px] bg-orange-50 px-1 py-0.2 rounded-sm">({startScene || '餐饮'})</span>
               </p>
             </div>
           </div>
@@ -202,9 +206,9 @@ export default function PhoneSimulator({
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-orange-500 shrink-0"></span>
             <div className="overflow-hidden min-w-0 flex-1 text-left">
-              <span className="text-[8px] text-neutral-400 font-extrabold uppercase">终点 (Q+S列):</span>
+              <span className="text-[8px] text-neutral-400 font-extrabold uppercase">终点 (Q、S、U列):</span>
               <p className="font-extrabold text-[10px] text-neutral-800 truncate leading-tight">
-                {endLocation} <span className="text-indigo-500 font-bold ml-1 text-[8px] bg-indigo-50 px-1 py-0.2 rounded-sm">({endScene || '公司'})</span>
+                {endCity ? `[${endCity}] ` : ''}{endLocation} <span className="text-indigo-500 font-bold ml-1 text-[8px] bg-indigo-50 px-1 py-0.2 rounded-sm">({endScene || '公司'})</span>
               </p>
             </div>
           </div>

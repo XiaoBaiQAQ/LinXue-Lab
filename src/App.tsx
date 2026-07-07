@@ -17,6 +17,38 @@ import PhoneSimulator from './components/PhoneSimulator';
 import AnalyticsPanel from './components/AnalyticsPanel';
 import { Compass, Sparkles, Activity, FileSpreadsheet, HelpCircle, ChevronLeft, ChevronRight, Copy, Check } from 'lucide-react';
 
+const parseVehicleList = (str: string): string[] => {
+  if (!str || str === '未加勾' || str === '未减勾' || str === '无') return [];
+  
+  const list: string[] = [];
+  // 1. Try to match [Name, Price] pattern, e.g. [惊喜特价车, 1400.000000]
+  const nestedRegex = /\[\s*([^,\]]+)\s*,\s*[^\]]+\s*\]/g;
+  let match;
+  let hasMatches = false;
+  while ((match = nestedRegex.exec(str)) !== null) {
+    if (match[1]) {
+      const name = match[1].trim().replace(/^['"]|['"]$/g, '');
+      if (name) {
+        list.push(name);
+        hasMatches = true;
+      }
+    }
+  }
+  
+  if (!hasMatches) {
+    // 2. Fallback to extracting any text within brackets or splitting
+    const clean = str.replace(/[\[\]]/g, '');
+    const items = clean.split(',').map(s => s.trim()).filter(Boolean);
+    items.forEach(item => {
+      // If it's a number (price), skip it, otherwise add it
+      if (isNaN(Number(item))) {
+        list.push(item.replace(/^['"]|['"]$/g, ''));
+      }
+    });
+  }
+  return list;
+};
+
 // Helpers to parse history Raw column and compute category distributions
 const parseHistoryRaw = (raw: string) => {
   if (!raw) return [];
@@ -27,82 +59,182 @@ const parseHistoryRaw = (raw: string) => {
     if (isNewFormat) {
       const parts = line.split('***');
       
-      // 1. Call Time (Part 0)
-      const dateTimeStr = (parts[0] || '').replace(/^\[+/, '').trim();
-      const dtParts = dateTimeStr.split(/\s+/);
-      const date = dtParts[0] || '2026-06-25';
-      const time = dtParts[1] || '21:18:51';
-      
-      // 2. Accept Rate / 应答率 (Part 1)
-      const acceptRate = (parts[1] || '').trim();
-      
-      // 3. Order details / 本次完单车型、价格、距离、起终点 (Part 2)
-      // e.g., "[惊喜特价车|2380.000000|17469.000000|灞桥区|枫林九溪·竹韵-南门(超超烟酒便利店旁)|灞桥区|西侯社区洪庆新苑]"
-      const orderDetailsRaw = (parts[2] || '').trim().replace(/^\[/, '').replace(/\]$/, '');
-      const orderDetails = orderDetailsRaw.split('|').map(s => s.trim());
-      
-      const vehicleType = orderDetails[0] || '特惠快车';
-      
-      // Fare from cents (usually unit is cent, divide by 100)
-      const rawPrice = parseFloat(orderDetails[1]);
-      const fare = !isNaN(rawPrice) 
-        ? (rawPrice > 100 ? Number((rawPrice / 100).toFixed(2)) : rawPrice) 
-        : 25.0;
-      
-      // Distance from meters (usually in meters, divide by 1000)
-      const rawDistance = parseFloat(orderDetails[2]);
-      const distanceKm = !isNaN(rawDistance) 
-        ? Number((rawDistance / 1000).toFixed(2)) 
-        : undefined;
-      
-      const startDistrict = orderDetails[3] || '';
-      const startDetail = orderDetails[4] || '';
-      const endDistrict = orderDetails[5] || '';
-      const endDetail = orderDetails[6] || '';
-      
-      const startLoc = startDetail ? `${startDistrict}·${startDetail}` : (startDistrict || '未知起点');
-      const endLoc = endDetail ? `${endDistrict}·${endDetail}` : (endDistrict || '未知终点');
-      
-      // 4. Default checked / 本次冒泡默认勾 (Part 3)
-      // e.g., "[惊喜特价车, 特惠快车]"
-      const defaultCheckedRaw = (parts[3] || '').trim().replace(/^\[/, '').replace(/\]$/, '');
-      const defaultChecked = defaultCheckedRaw 
-        ? defaultCheckedRaw.split(',').map(s => s.trim()).filter(Boolean) 
-        : [];
-      
-      // 5. Added checked / 加勾 (Part 4)
-      const addedCheckedRaw = (parts[4] || '').trim().replace(/^\[/, '').replace(/\]$/, '');
-      const addedChecked = addedCheckedRaw === '未加勾' || !addedCheckedRaw 
-        ? [] 
-        : addedCheckedRaw.split(',').map(s => s.trim()).filter(Boolean);
-      
-      // 6. Removed checked / 减勾 (Part 5)
-      const removedCheckedRaw = (parts[5] || '').trim().replace(/^\[/, '').replace(/\]+$/, '');
-      const removedChecked = removedCheckedRaw === '未减勾' || !removedCheckedRaw 
-        ? [] 
-        : removedCheckedRaw.split(',').map(s => s.trim()).filter(Boolean);
-      
-      return {
-        orderId: `HIST-${idx}-${Math.random().toString(36).substr(2, 4)}`,
-        date,
-        time,
-        vehicleType,
-        fare,
-        discount: Number((fare * 0.12).toFixed(1)),
-        rating: 5,
-        isCompleted: true,
-        startLoc,
-        endLoc,
-        acceptRate,
-        startDistrict,
-        startDetail,
-        endDistrict,
-        endDetail,
-        distanceKm,
-        defaultChecked,
-        addedChecked,
-        removedChecked
-      };
+      // If parts.length >= 6, then it matches the requested 8-field format
+      if (parts.length >= 6) {
+        // 1. Call Time (Part 0)
+        const dateTimeStr = (parts[0] || '').replace(/^\[+/, '').trim();
+        const dtParts = dateTimeStr.split(/\s+/);
+        const date = dtParts[0] || '2026-06-12';
+        const time = dtParts[1] || '19:11:21';
+        
+        // 2. Order Source (Part 1)
+        const orderSource = (parts[1] || '').trim();
+        
+        // 3. Completed Vehicle Info (Part 2)
+        const completedRaw = (parts[2] || '').trim();
+        const isCompleted = completedRaw !== '未完单' && completedRaw !== '';
+        
+        let vehicleType = '未完单';
+        let fare = 0;
+        let distanceKm: number | undefined = undefined;
+        let startLoc = '未知起点';
+        let endLoc = '未知终点';
+        let startCity = '';
+        let endCity = '';
+        
+        if (isCompleted) {
+          const detailStr = completedRaw.replace(/^\[/, '').replace(/\]$/, '');
+          const detailParts = detailStr.split('|').map(s => s.trim());
+          
+          vehicleType = detailParts[0] || '未知车型';
+          
+          const rawPrice = parseFloat(detailParts[4]);
+          fare = !isNaN(rawPrice)
+            ? (rawPrice > 100 ? Number((rawPrice / 100).toFixed(2)) : rawPrice)
+            : 0;
+            
+          const rawDistance = parseFloat(detailParts[5]);
+          distanceKm = !isNaN(rawDistance)
+            ? Number((rawDistance / 1000).toFixed(2))
+            : undefined;
+            
+          startCity = detailParts[6] || '';
+          endCity = detailParts[7] || '';
+          const startDistrict = detailParts[8] || '';
+          const startDetail = detailParts[9] || '';
+          const endDistrict = detailParts[10] || '';
+          const endDetail = detailParts[11] || '';
+          
+          const startPrefix = startCity ? `[${startCity}] ` : '';
+          const endPrefix = endCity ? `[${endCity}] ` : '';
+          
+          startLoc = startDetail ? `${startPrefix}${startDistrict}·${startDetail}` : (startDistrict ? `${startPrefix}${startDistrict}` : '未知起点');
+          endLoc = endDetail ? `${endPrefix}${endDistrict}·${endDetail}` : (endDistrict ? `${endPrefix}${endDistrict}` : '未知终点');
+        } else {
+          // For 未完单, let's try to parse estimated price from Part 3 (Default Checked)
+          const bubbleRaw = parts[3] || '';
+          const priceMatch = bubbleRaw.match(/,\s*([\d\.]+)/);
+          if (priceMatch) {
+            const rawPrice = parseFloat(priceMatch[1]);
+            fare = !isNaN(rawPrice)
+              ? (rawPrice > 100 ? Number((rawPrice / 100).toFixed(2)) : rawPrice)
+              : 0;
+          }
+        }
+        
+        // 4. Default checked (Part 3)
+        const defaultChecked = parseVehicleList(parts[3] || '');
+        
+        // 5. Added checked (Part 4)
+        const addedChecked = parseVehicleList(parts[4] || '');
+        
+        // 6. Removed checked (Part 5)
+        const removedChecked = parseVehicleList(parts[5] || '');
+        
+        // 7. Estimated Accept Rate (Part 6)
+        const acceptRate = parts[6] ? parts[6].trim() : '未知';
+        
+        // 8. Is Premium Zone (Part 7)
+        const isPremiumZone = parts[7] ? parts[7].trim() : '非特区';
+        
+        return {
+          orderId: `HIST-${idx}-${Math.random().toString(36).substr(2, 4)}`,
+          date,
+          time,
+          vehicleType,
+          fare,
+          discount: Number((fare * 0.12).toFixed(1)),
+          rating: 5,
+          isCompleted,
+          startLoc,
+          endLoc,
+          acceptRate,
+          defaultChecked,
+          addedChecked,
+          removedChecked,
+          orderSource,
+          isPremiumZone
+        };
+      } else {
+        const parts = line.split('***');
+        
+        // 1. Call Time (Part 0)
+        const dateTimeStr = (parts[0] || '').replace(/^\[+/, '').trim();
+        const dtParts = dateTimeStr.split(/\s+/);
+        const date = dtParts[0] || '2026-06-25';
+        const time = dtParts[1] || '21:18:51';
+        
+        // 2. Accept Rate / 应答率 (Part 1)
+        const acceptRate = (parts[1] || '').trim();
+        
+        // 3. Order details / 本次完单车型、价格、距离、起终点 (Part 2)
+        // e.g., "[惊喜特价车|2380.000000|17469.000000|灞桥区|枫林九溪·竹韵-南门(超超烟酒便利店旁)|灞桥区|西侯社区洪庆新苑]"
+        const orderDetailsRaw = (parts[2] || '').trim().replace(/^\[/, '').replace(/\]$/, '');
+        const orderDetails = orderDetailsRaw.split('|').map(s => s.trim());
+        
+        const vehicleType = orderDetails[0] || '特惠快车';
+        
+        // Fare from cents (usually unit is cent, divide by 100)
+        const rawPrice = parseFloat(orderDetails[1]);
+        const fare = !isNaN(rawPrice) 
+          ? (rawPrice > 100 ? Number((rawPrice / 100).toFixed(2)) : rawPrice) 
+          : 25.0;
+        
+        // Distance from meters (usually in meters, divide by 1000)
+        const rawDistance = parseFloat(orderDetails[2]);
+        const distanceKm = !isNaN(rawDistance) 
+          ? Number((rawDistance / 1000).toFixed(2)) 
+          : undefined;
+        
+        const startDistrict = orderDetails[3] || '';
+        const startDetail = orderDetails[4] || '';
+        const endDistrict = orderDetails[5] || '';
+        const endDetail = orderDetails[6] || '';
+        
+        const startLoc = startDetail ? `${startDistrict}·${startDetail}` : (startDistrict || '未知起点');
+        const endLoc = endDetail ? `${endDistrict}·${endDetail}` : (endDistrict || '未知终点');
+        
+        // 4. Default checked / 本次冒泡默认勾 (Part 3)
+        // e.g., "[惊喜特价车, 特惠快车]"
+        const defaultCheckedRaw = (parts[3] || '').trim().replace(/^\[/, '').replace(/\]$/, '');
+        const defaultChecked = defaultCheckedRaw 
+          ? defaultCheckedRaw.split(',').map(s => s.trim()).filter(Boolean) 
+          : [];
+        
+        // 5. Added checked / 加勾 (Part 4)
+        const addedCheckedRaw = (parts[4] || '').trim().replace(/^\[/, '').replace(/\]$/, '');
+        const addedChecked = addedCheckedRaw === '未加勾' || !addedCheckedRaw 
+          ? [] 
+          : addedCheckedRaw.split(',').map(s => s.trim()).filter(Boolean);
+        
+        // 6. Removed checked / 减勾 (Part 5)
+        const removedCheckedRaw = (parts[5] || '').trim().replace(/^\[/, '').replace(/\]+$/, '');
+        const removedChecked = removedCheckedRaw === '未减勾' || !removedCheckedRaw 
+          ? [] 
+          : removedCheckedRaw.split(',').map(s => s.trim()).filter(Boolean);
+        
+        return {
+          orderId: `HIST-${idx}-${Math.random().toString(36).substr(2, 4)}`,
+          date,
+          time,
+          vehicleType,
+          fare,
+          discount: Number((fare * 0.12).toFixed(1)),
+          rating: 5,
+          isCompleted: true,
+          startLoc,
+          endLoc,
+          acceptRate,
+          startDistrict,
+          startDetail,
+          endDistrict,
+          endDetail,
+          distanceKm,
+          defaultChecked,
+          addedChecked,
+          removedChecked
+        };
+      }
     } else {
       // Fallback old parsing logic
       const cleanLine = line.replace(/[\[\]]/g, '');
@@ -137,7 +269,13 @@ const parseHistoryRaw = (raw: string) => {
 const calculateCategoryDistribution = (rides: any[]) => {
   const counts: Record<string, number> = {};
   rides.forEach((r) => {
-    counts[r.vehicleType] = (counts[r.vehicleType] || 0) + 1;
+    if (r.vehicleType === '未完单') {
+      if (r.orderSource === '冒泡') {
+        counts[r.vehicleType] = (counts[r.vehicleType] || 0) + 1;
+      }
+    } else {
+      counts[r.vehicleType] = (counts[r.vehicleType] || 0) + 1;
+    }
   });
   
   const dist = Object.entries(counts).map(([name, value]) => ({ name, value }));
@@ -201,7 +339,8 @@ export default function App() {
     setVehicleOptions(active.vehicles);
 
     // 2. Parse History Raw
-    const parsedRides = parseHistoryRaw(active.historyRaw);
+    const allParsedRides = parseHistoryRaw(active.historyRaw);
+    const parsedRides = allParsedRides.filter((r) => r.orderSource === '冒泡' || r.orderSource === undefined);
     const totalSpent = parsedRides.reduce((sum, r) => sum + r.fare, 0);
     const categoryDistribution = calculateCategoryDistribution(parsedRides);
     const pastData: Past30DaysData = {
@@ -216,7 +355,7 @@ export default function App() {
         rides: 1
       })),
       categoryDistribution,
-      rides: parsedRides
+      rides: allParsedRides
     };
     setPast30Days(pastData);
 
@@ -286,6 +425,8 @@ export default function App() {
       userChoices: active.vehicles.filter((v) => v.checked).map((v) => v.name),
       bubbleTime: active.bubbleTime,
       estimatedAcceptRate: active.estimatedAcceptRate,
+      startCity: active.startCity,
+      endCity: active.endCity,
       startScene: active.startScene,
       endScene: active.endScene,
       sessionEvents: events,
@@ -513,6 +654,8 @@ export default function App() {
                 durationMin={currentSession.durationMin}
                 startScene={currentSession.startScene}
                 endScene={currentSession.endScene}
+                startCity={currentSession.startCity}
+                endCity={currentSession.endCity}
               />
               <p className="text-[10px] text-slate-400 text-center mt-3 max-w-[280px] leading-relaxed">
                 💡 <b>提示</b>：点击列表中的车型复选框将动态模拟用户的选择行为，并自动生成比价轨迹日志
