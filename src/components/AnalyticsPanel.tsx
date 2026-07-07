@@ -4,7 +4,7 @@
  */
 
 import React, { useState } from 'react';
-import { UserPersona, CurrentSession, Past30DaysData, VehicleOption } from '../types';
+import { UserPersona, CurrentSession, Past30DaysData, VehicleOption, VehicleItem } from '../types';
 import {
   User,
   History,
@@ -283,9 +283,16 @@ export default function AnalyticsPanel({
                             </span>
                           )}
                         </div>
-                        <span className="text-[9px] text-slate-400 font-mono font-bold whitespace-nowrap">
-                          ⏱️ {ride.date} {ride.time}
-                        </span>
+                        <div className="flex flex-col items-end text-right whitespace-nowrap shrink-0">
+                          <span className="text-[9px] text-slate-400 font-mono font-bold">
+                            ⏱️ 呼叫: {ride.date} {ride.time}
+                          </span>
+                          {ride.replyTime && (
+                            <span className="text-[9px] text-emerald-600 font-mono font-bold">
+                              📞 应答: {ride.replyTime}
+                            </span>
+                          )}
+                        </div>
                       </div>
 
                       {/* Row: Price and Distance */}
@@ -316,11 +323,20 @@ export default function AnalyticsPanel({
                       <div className="grid grid-cols-3 gap-1.5 pt-2 border-t border-slate-100 text-[8px] leading-normal font-medium text-slate-500">
                         <div>
                           <p className="text-slate-400 font-bold mb-0.5">🫧 冒泡默认勾</p>
-                          <div className="flex flex-wrap gap-0.5">
+                          <div className="flex flex-wrap gap-1">
                             {ride.defaultChecked && ride.defaultChecked.length > 0 ? (
-                              ride.defaultChecked.map((item, i) => (
-                                <span key={i} className="bg-slate-200/50 text-slate-700 px-1 py-0.5 rounded-xs scale-90 origin-left truncate max-w-[50px] inline-block">{item}</span>
-                              ))
+                              ride.defaultChecked.map((item, i) => {
+                                const name = typeof item === 'string' ? item : item.name;
+                                const price = typeof item === 'string' ? undefined : item.price;
+                                return (
+                                  <span key={i} className="bg-slate-100 text-slate-700 px-1 py-0.5 rounded-xs text-[8.5px] border border-slate-200/50 flex items-center gap-0.5 font-bold leading-none">
+                                    <span>{name}</span>
+                                    {price !== undefined && (
+                                      <span className="text-orange-600 font-mono font-extrabold text-[8px] ml-0.5">¥{price}</span>
+                                    )}
+                                  </span>
+                                );
+                              })
                             ) : (
                               <span className="text-slate-300 italic">无</span>
                             )}
@@ -328,11 +344,20 @@ export default function AnalyticsPanel({
                         </div>
                         <div>
                           <p className="text-emerald-600 font-bold mb-0.5">➕ 加勾</p>
-                          <div className="flex flex-wrap gap-0.5">
+                          <div className="flex flex-wrap gap-1">
                             {ride.addedChecked && ride.addedChecked.length > 0 ? (
-                              ride.addedChecked.map((item, i) => (
-                                <span key={i} className="bg-emerald-50 text-emerald-700 px-1 py-0.5 rounded-xs scale-90 origin-left truncate max-w-[50px] inline-block">{item}</span>
-                              ))
+                              ride.addedChecked.map((item, i) => {
+                                const name = typeof item === 'string' ? item : item.name;
+                                const price = typeof item === 'string' ? undefined : item.price;
+                                return (
+                                  <span key={i} className="bg-emerald-50 text-emerald-700 px-1 py-0.5 rounded-xs text-[8.5px] border border-emerald-100 flex items-center gap-0.5 font-bold leading-none">
+                                    <span>{name}</span>
+                                    {price !== undefined && (
+                                      <span className="text-orange-600 font-mono font-extrabold text-[8px] ml-0.5">¥{price}</span>
+                                    )}
+                                  </span>
+                                );
+                              })
                             ) : (
                               <span className="text-slate-300 italic">无</span>
                             )}
@@ -340,11 +365,20 @@ export default function AnalyticsPanel({
                         </div>
                         <div>
                           <p className="text-red-500 font-bold mb-0.5">➖ 减勾</p>
-                          <div className="flex flex-wrap gap-0.5">
+                          <div className="flex flex-wrap gap-1">
                             {ride.removedChecked && ride.removedChecked.length > 0 ? (
-                              ride.removedChecked.map((item, i) => (
-                                <span key={i} className="bg-red-50 text-red-700 px-1 py-0.5 rounded-xs scale-90 origin-left truncate max-w-[50px] inline-block">{item}</span>
-                              ))
+                              ride.removedChecked.map((item, i) => {
+                                const name = typeof item === 'string' ? item : item.name;
+                                const price = typeof item === 'string' ? undefined : item.price;
+                                return (
+                                  <span key={i} className="bg-red-50 text-red-700 px-1 py-0.5 rounded-xs text-[8.5px] border border-red-100 flex items-center gap-0.5 font-bold leading-none">
+                                    <span>{name}</span>
+                                    {price !== undefined && (
+                                      <span className="text-orange-600 font-mono font-extrabold text-[8px] ml-0.5">¥{price}</span>
+                                    )}
+                                  </span>
+                                );
+                              })
                             ) : (
                               <span className="text-slate-300 italic">无</span>
                             )}

@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { UserPersona, CurrentSession, VehicleOption, Past30DaysData, SessionEvent, ParsedExcelSession } from './types';
+import { UserPersona, CurrentSession, VehicleOption, Past30DaysData, SessionEvent, ParsedExcelSession, VehicleItem } from './types';
 import {
   INITIAL_VEHICLE_OPTIONS,
   DEFAULT_USER_PERSONA,
@@ -17,19 +17,23 @@ import PhoneSimulator from './components/PhoneSimulator';
 import AnalyticsPanel from './components/AnalyticsPanel';
 import { Compass, Sparkles, Activity, FileSpreadsheet, HelpCircle, ChevronLeft, ChevronRight, Copy, Check } from 'lucide-react';
 
-const parseVehicleList = (str: string): string[] => {
+const parseVehicleList = (str: string): VehicleItem[] => {
   if (!str || str === '未加勾' || str === '未减勾' || str === '无') return [];
   
-  const list: string[] = [];
+  const list: VehicleItem[] = [];
   // 1. Try to match [Name, Price] pattern, e.g. [惊喜特价车, 1400.000000]
-  const nestedRegex = /\[\s*([^,\]]+)\s*,\s*[^\]]+\s*\]/g;
+  const nestedRegex = /\[\s*([^,\]]+)\s*,\s*([^\]]+)\s*\]/g;
   let match;
   let hasMatches = false;
   while ((match = nestedRegex.exec(str)) !== null) {
     if (match[1]) {
       const name = match[1].trim().replace(/^['"]|['"]$/g, '');
+      const rawPrice = parseFloat(match[2]);
+      const price = !isNaN(rawPrice)
+        ? (rawPrice > 100 ? Number((rawPrice / 100).toFixed(2)) : rawPrice)
+        : undefined;
       if (name) {
-        list.push(name);
+        list.push({ name, price });
         hasMatches = true;
       }
     }
@@ -42,7 +46,7 @@ const parseVehicleList = (str: string): string[] => {
     items.forEach(item => {
       // If it's a number (price), skip it, otherwise add it
       if (isNaN(Number(item))) {
-        list.push(item.replace(/^['"]|['"]$/g, ''));
+        list.push({ name: item.replace(/^['"]|['"]$/g, '') });
       }
     });
   }
@@ -81,6 +85,7 @@ const parseHistoryRaw = (raw: string) => {
         let endLoc = '未知终点';
         let startCity = '';
         let endCity = '';
+        let replyTime: string | undefined = undefined;
         
         if (isCompleted) {
           const detailStr = completedRaw.replace(/^\[/, '').replace(/\]$/, '');
@@ -110,6 +115,11 @@ const parseHistoryRaw = (raw: string) => {
           
           startLoc = startDetail ? `${startPrefix}${startDistrict}·${startDetail}` : (startDistrict ? `${startPrefix}${startDistrict}` : '未知起点');
           endLoc = endDetail ? `${endPrefix}${endDistrict}·${endDetail}` : (endDistrict ? `${endPrefix}${endDistrict}` : '未知终点');
+
+          const candReplyTime = detailParts[2] || '';
+          if (candReplyTime && candReplyTime !== 'null' && candReplyTime !== 'undefined' && candReplyTime !== '') {
+            replyTime = candReplyTime;
+          }
         } else {
           // For 未完单, let's try to parse estimated price from Part 3 (Default Checked)
           const bubbleRaw = parts[3] || '';
@@ -153,7 +163,8 @@ const parseHistoryRaw = (raw: string) => {
           addedChecked,
           removedChecked,
           orderSource,
-          isPremiumZone
+          isPremiumZone,
+          replyTime
         };
       } else {
         const parts = line.split('***');
@@ -196,22 +207,13 @@ const parseHistoryRaw = (raw: string) => {
         
         // 4. Default checked / 本次冒泡默认勾 (Part 3)
         // e.g., "[惊喜特价车, 特惠快车]"
-        const defaultCheckedRaw = (parts[3] || '').trim().replace(/^\[/, '').replace(/\]$/, '');
-        const defaultChecked = defaultCheckedRaw 
-          ? defaultCheckedRaw.split(',').map(s => s.trim()).filter(Boolean) 
-          : [];
+        const defaultChecked = parseVehicleList(parts[3] || '');
         
         // 5. Added checked / 加勾 (Part 4)
-        const addedCheckedRaw = (parts[4] || '').trim().replace(/^\[/, '').replace(/\]$/, '');
-        const addedChecked = addedCheckedRaw === '未加勾' || !addedCheckedRaw 
-          ? [] 
-          : addedCheckedRaw.split(',').map(s => s.trim()).filter(Boolean);
+        const addedChecked = parseVehicleList(parts[4] || '');
         
         // 6. Removed checked / 减勾 (Part 5)
-        const removedCheckedRaw = (parts[5] || '').trim().replace(/^\[/, '').replace(/\]+$/, '');
-        const removedChecked = removedCheckedRaw === '未减勾' || !removedCheckedRaw 
-          ? [] 
-          : removedCheckedRaw.split(',').map(s => s.trim()).filter(Boolean);
+        const removedChecked = parseVehicleList(parts[5] || '');
         
         return {
           orderId: `HIST-${idx}-${Math.random().toString(36).substr(2, 4)}`,
@@ -269,11 +271,7 @@ const parseHistoryRaw = (raw: string) => {
 const calculateCategoryDistribution = (rides: any[]) => {
   const counts: Record<string, number> = {};
   rides.forEach((r) => {
-    if (r.vehicleType === '未完单') {
-      if (r.orderSource === '冒泡') {
-        counts[r.vehicleType] = (counts[r.vehicleType] || 0) + 1;
-      }
-    } else {
+    if (r.isCompleted && r.vehicleType && r.vehicleType !== '未完单') {
       counts[r.vehicleType] = (counts[r.vehicleType] || 0) + 1;
     }
   });
@@ -342,13 +340,14 @@ export default function App() {
     const allParsedRides = parseHistoryRaw(active.historyRaw);
     const parsedRides = allParsedRides.filter((r) => r.orderSource === '冒泡' || r.orderSource === undefined);
     const totalSpent = parsedRides.reduce((sum, r) => sum + r.fare, 0);
-    const categoryDistribution = calculateCategoryDistribution(parsedRides);
+    const categoryDistribution = calculateCategoryDistribution(allParsedRides);
+    const preferredVehicle = categoryDistribution.reduce((max, r) => r.value > max.value ? r : max, { name: '特惠快车', value: 0 }).name;
     const pastData: Past30DaysData = {
       totalRides: parsedRides.length,
       totalSpent: Number(totalSpent.toFixed(1)),
       avgDiscountRate: 0.15,
       avgDistance: Number((parsedRides.reduce((sum, r) => sum + (active.distanceKm || 8), 0) / (parsedRides.length || 1)).toFixed(1)),
-      preferredVehicle: parsedRides[0]?.vehicleType || '特惠快车',
+      preferredVehicle,
       dailyTrend: parsedRides.map((r) => ({
         date: r.date.substring(5) || '06-25',
         spent: r.fare,

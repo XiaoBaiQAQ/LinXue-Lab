@@ -454,7 +454,9 @@ export default function ExcelImporter({ onDataImported, onAddEvent }: ExcelImpor
 
               const counts: { [key: string]: number } = {};
               parsedRides.forEach(r => {
-                counts[r.vehicleType] = (counts[r.vehicleType] || 0) + 1;
+                if (r.isCompleted && r.vehicleType && r.vehicleType !== '未完单') {
+                  counts[r.vehicleType] = (counts[r.vehicleType] || 0) + 1;
+                }
               });
               let preferredVehicle = '特惠快车';
               let maxCount = 0;

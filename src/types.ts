@@ -67,6 +67,11 @@ export interface VehicleOption {
   displayOrder?: number; // Column E
 }
 
+export interface VehicleItem {
+  name: string;
+  price?: number;
+}
+
 export interface HistoricalRide {
   orderId: string;
   date: string;
@@ -84,11 +89,12 @@ export interface HistoricalRide {
   endDistrict?: string;         // 终点区县
   endDetail?: string;           // 终点详细地址
   distanceKm?: number;          // 订单距离
-  defaultChecked?: string[];     // 本次冒泡默认勾
-  addedChecked?: string[];       // 加勾
-  removedChecked?: string[];     // 减勾
+  defaultChecked?: VehicleItem[];     // 本次冒泡默认勾
+  addedChecked?: VehicleItem[];       // 加勾
+  removedChecked?: VehicleItem[];     // 减勾
   orderSource?: string;          // 订单来源 (冒泡 / 等应答)
   isPremiumZone?: string;        // 是否特区
+  replyTime?: string;            // 应答时间
 }
 
 export interface Past30DaysData {
