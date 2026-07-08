@@ -197,6 +197,14 @@ export default function ExcelImporter({ onDataImported, onAddEvent }: ExcelImpor
             idx = headers.findIndex(h => names.some(name => {
               const hLower = h.toLowerCase();
               const nameLower = name.toLowerCase();
+              
+              // Guard against matching city columns when we are looking for actual address/locations
+              const isSearchingLocation = ['起点', '终点', '出发', '目的地', '出发地'].some(k => nameLower.includes(k));
+              const isCityHeader = hLower.includes('城市') || hLower.includes('市级') || hLower.endsWith('市');
+              if (isSearchingLocation && isCityHeader && !nameLower.includes('城市') && !nameLower.includes('市')) {
+                return false;
+              }
+
               if (nameLower === '城市') {
                 if (hLower.includes('出发') || hLower.includes('终点') || hLower.includes('目的地') || hLower.includes('始发') || hLower.includes('到达')) {
                   return false;
