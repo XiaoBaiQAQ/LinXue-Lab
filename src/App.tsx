@@ -15,7 +15,7 @@ import {
 import ExcelImporter from './components/ExcelImporter';
 import PhoneSimulator from './components/PhoneSimulator';
 import AnalyticsPanel from './components/AnalyticsPanel';
-import { Compass, Sparkles, Activity, FileSpreadsheet, HelpCircle, ChevronLeft, ChevronRight, Copy, Check } from 'lucide-react';
+import { Compass, Sparkles, Activity, FileSpreadsheet, HelpCircle, ChevronLeft, ChevronRight, Copy, Check, Search } from 'lucide-react';
 
 const parseVehicleList = (str: string): VehicleItem[] => {
   if (!str || str === '未加勾' || str === '未减勾' || str === '无') return [];
@@ -116,7 +116,7 @@ const parseHistoryRaw = (raw: string) => {
           startLoc = startDetail ? `${startPrefix}${startDistrict}·${startDetail}` : (startDistrict ? `${startPrefix}${startDistrict}` : '未知起点');
           endLoc = endDetail ? `${endPrefix}${endDistrict}·${endDetail}` : (endDistrict ? `${endPrefix}${endDistrict}` : '未知终点');
 
-          const candReplyTime = detailParts[2] || '';
+          const candReplyTime = detailParts[3] || '';
           if (candReplyTime && candReplyTime !== 'null' && candReplyTime !== 'undefined' && candReplyTime !== '') {
             replyTime = candReplyTime;
           }
@@ -290,6 +290,32 @@ export default function App() {
   // Global Excel high-fidelity session pool
   const [sessions, setSessions] = useState<ParsedExcelSession[]>(DEFAULT_EXCEL_SESSIONS);
   const [selectedSessionId, setSelectedSessionId] = useState<string>('c448d6e66a');
+  
+  // Passenger ID Search State & Handler
+  const [searchId, setSearchId] = useState('');
+  const [searchError, setSearchError] = useState(false);
+
+  const handleSearch = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const query = searchId.trim();
+    if (!query) return;
+
+    // Find direct match or substring match
+    const found = sessions.find(
+      (s) => s.passengerId.toLowerCase() === query.toLowerCase()
+    ) || sessions.find(
+      (s) => s.passengerId.toLowerCase().includes(query.toLowerCase())
+    );
+
+    if (found) {
+      setSelectedSessionId(found.passengerId);
+      setAiAnalysisResult(null);
+      setSearchError(false);
+    } else {
+      setSearchError(true);
+      setTimeout(() => setSearchError(false), 3000);
+    }
+  };
 
   // Copy ID State & Handler
   const [copied, setCopied] = useState(false);
@@ -623,6 +649,40 @@ export default function App() {
                 👤 {sessions[currentIndex].city || '未知'} · {sessions[currentIndex].gender || '未知'} · {sessions[currentIndex].age || '未知'}岁
               </span>
             )}
+
+            {/* Passenger ID Search Input Bar */}
+            <form onSubmit={handleSearch} className="flex items-center relative shrink-0">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="搜索 乘客 ID..."
+                  value={searchId}
+                  onChange={(e) => {
+                    setSearchId(e.target.value);
+                    setSearchError(false);
+                  }}
+                  className={`w-36 sm:w-44 pl-8 pr-2.5 py-1.5 text-xs font-bold rounded-lg border bg-white shadow-3xs transition-all outline-hidden focus:ring-1 ${
+                    searchError
+                      ? 'border-red-400 text-red-600 focus:border-red-500 focus:ring-red-400/30'
+                      : 'border-slate-200 text-slate-800 placeholder-slate-400 focus:border-orange-500 focus:ring-orange-500/20'
+                  }`}
+                />
+                <Search className={`absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 ${
+                  searchError ? 'text-red-500' : 'text-slate-400'
+                }`} />
+              </div>
+              <button
+                type="submit"
+                className="ml-1.5 px-3 py-1.5 text-xs font-extrabold text-white bg-orange-500 hover:bg-orange-600 active:scale-95 transition-all rounded-lg shadow-2xs cursor-pointer flex items-center gap-1"
+              >
+                搜索
+              </button>
+              {searchError && (
+                <div className="absolute top-full left-0 mt-1.5 bg-red-50 border border-red-200 text-red-600 text-[10px] font-bold px-2 py-1 rounded-md shadow-md z-50 animate-bounce">
+                  未找到该乘客 ID 🤷‍♂️
+                </div>
+              )}
+            </form>
           </div>
           
           <div className="flex items-center gap-2 text-[11px] shrink-0">
